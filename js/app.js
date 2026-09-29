@@ -360,11 +360,93 @@ class HistoryArenaApp {
             this.addScore(this.activeTeamId, question.points, 'correct');
             this.setJeopardyStatus(question.id, 'correct');
             modal.classList.remove('active');
+            this.stopModalTimer();
             this.renderJeopardyBoard();
         };
 
         modal.classList.add('active');
-        this.startTimer(25);
+        this.startModalTimer(25);
+    }
+
+    startModalTimer(seconds = 25) {
+        this.stopModalTimer();
+        this.modalTimerRemaining = seconds;
+        this.modalTimerRunning = true;
+        this.updateModalTimerDisplay();
+
+        const widget = document.getElementById('j-modal-timer-widget');
+        if (widget) widget.classList.remove('urgent');
+
+        this.modalTimerInterval = setInterval(() => {
+            if (this.modalTimerRemaining > 0) {
+                this.modalTimerRemaining -= 1;
+                this.updateModalTimerDisplay();
+
+                if (this.modalTimerRemaining <= 5 && this.modalTimerRemaining > 0) {
+                    window.soundManager.playUrgentTick();
+                    if (widget) widget.classList.add('urgent');
+                } else if (this.modalTimerRemaining > 5) {
+                    window.soundManager.playTick();
+                    if (widget) widget.classList.remove('urgent');
+                }
+
+                if (this.modalTimerRemaining === 0) {
+                    this.stopModalTimer();
+                    window.soundManager.playTimeout();
+                    if (widget) widget.classList.add('urgent');
+                    const fbBox = document.getElementById('j-modal-feedback');
+                    if (fbBox && !fbBox.classList.contains('active')) {
+                        fbBox.innerHTML = `
+                            <div class="feedback-title wrong">⏱ УАҚЫТ АЯҚТАЛДЫ!</div>
+                            <div class="feedback-explanation">Уақыт бітті. Оқытушы шешім қабылдайды немесе басқа командаға мүмкіндік беріледі.</div>
+                        `;
+                        fbBox.classList.add('active');
+                    }
+                }
+            }
+        }, 1000);
+    }
+
+    stopModalTimer() {
+        if (this.modalTimerInterval) {
+            clearInterval(this.modalTimerInterval);
+            this.modalTimerInterval = null;
+        }
+        this.modalTimerRunning = false;
+    }
+
+    pauseResumeModalTimer() {
+        if (!this.modalTimerRunning && this.modalTimerRemaining > 0) {
+            this.modalTimerRunning = true;
+            this.modalTimerInterval = setInterval(() => {
+                if (this.modalTimerRemaining > 0) {
+                    this.modalTimerRemaining -= 1;
+                    this.updateModalTimerDisplay();
+                    if (this.modalTimerRemaining <= 5 && this.modalTimerRemaining > 0) {
+                        window.soundManager.playUrgentTick();
+                    }
+                    if (this.modalTimerRemaining === 0) {
+                        this.stopModalTimer();
+                        window.soundManager.playTimeout();
+                    }
+                }
+            }, 1000);
+        } else {
+            this.stopModalTimer();
+        }
+    }
+
+    addModalTimerSeconds(sec) {
+        this.modalTimerRemaining += sec;
+        this.updateModalTimerDisplay();
+        window.soundManager.playClick();
+    }
+
+    updateModalTimerDisplay() {
+        const mm = String(Math.floor((this.modalTimerRemaining || 0) / 60)).padStart(2, '0');
+        const ss = String((this.modalTimerRemaining || 0) % 60).padStart(2, '0');
+        const el = document.getElementById('j-modal-timer-display');
+        if (el) el.textContent = `${mm}:${ss}`;
     }
 
     handleJeopardyAnswer(selectedIdx, btnElement) {
@@ -374,7 +456,7 @@ class HistoryArenaApp {
 
         if (isCorrect) {
             // Дұрыс жауапты басқанда ғана жасыл түс жансын
-            this.stopTimer();
+            this.stopModalTimer();
             btnElement.classList.add('correct');
             window.soundManager.playCorrect();
 
@@ -384,7 +466,7 @@ class HistoryArenaApp {
             `;
             fbBox.classList.add('active');
 
-            // Disable all other options
+            // Disable all options once correct answer is found
             document.querySelectorAll('#j-modal-options .btn-option-card').forEach(b => b.classList.add('disabled'));
 
             // Award score and mark cell permanently RED on board
@@ -1179,9 +1261,15 @@ class HistoryArenaApp {
         // Modal Close Buttons
         document.querySelectorAll('.btn-modal-close').forEach(btn => {
             btn.addEventListener('click', () => {
+                this.stopModalTimer();
                 document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
             });
         });
+
+        // Dedicated Modal Timer Buttons
+        document.getElementById('j-modal-pause-btn')?.addEventListener('click', () => this.pauseResumeModalTimer());
+        document.getElementById('j-modal-plus10-btn')?.addEventListener('click', () => this.addModalTimerSeconds(10));
+        document.getElementById('j-modal-reset-btn')?.addEventListener('click', () => this.startModalTimer(25));
 
         // Time Machine check button
         document.getElementById('tm-check-btn')?.addEventListener('click', () => this.checkTimeMachineOrder());
