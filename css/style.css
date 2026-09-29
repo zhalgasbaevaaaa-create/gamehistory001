@@ -37,14 +37,15 @@
     --radius-lg: 20px;
     --radius-full: 9999px;
     
-    --font-heading: 'Cinzel', 'Trajan Pro', 'Georgia', serif;
-    --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-heading: 'Lora', 'Georgia', serif;
+    --font-body: 'Lora', 'Georgia', serif;
 }
 
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-family: 'Lora', 'Georgia', serif;
 }
 
 body {
@@ -64,6 +65,10 @@ body {
     overflow-x: hidden;
     user-select: none;
     -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+    font-family: 'Lora', 'Georgia', serif;
 }
 
 /* Scrollbar */
