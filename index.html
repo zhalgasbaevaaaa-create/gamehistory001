@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Қазақ жеріндегі тас, қола, темір дәуірі — Тарихи Арена</title>
+    <!-- Google Fonts for High Readability on Projectors and Smartboards -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Confetti Particle Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- ==========================================================================
+         TOP ARENA HEADER & 8 TEAMS SCOREBOARD RIBBON
+         ========================================================================== -->
+    <header class="arena-header">
+        <div class="header-top-bar">
+            <div class="logo-area" onclick="window.app.showView('menu')">
+                <span class="logo-badge">🏛️</span>
+                <div>
+                    <div class="logo-title">ҚАЗАҚСТАН ТАРИХИ АРЕНАСЫ</div>
+                    <div class="logo-subtitle">ТАС • ҚОЛА • ТЕМІР ДӘУІРІ (52 СТУДЕНТ / 8 КОМАНДА)</div>
+                </div>
+            </div>
+
+            <div class="header-controls">
+                <button id="btn-toggle-sound" class="btn-icon-control active" title="Дыбысты қосу/өшіру">🔊 Дыбыс</button>
+                <button id="btn-toggle-fullscreen" class="btn-icon-control" title="Толық экран режимі">⛶ Толық экран</button>
+                <button id="btn-teacher-mode" class="btn-icon-control" title="Оқытушы және бағалау басқару панелі">👨‍🏫 Оқытушы режимі</button>
+            </div>
+        </div>
+
+        <!-- 8 Teams Scoreboard Ribbon -->
+        <div class="teams-ribbon-container">
+            <div id="teams-ribbon" class="teams-ribbon">
+                <!-- Dynamically rendered 8 teams -->
+            </div>
+        </div>
+    </header>
+
+    <!-- ==========================================================================
+         MAIN ARENA CONTENT VIEWS
+         ========================================================================== -->
+    <main class="arena-main">
+
+        <!-- ==========================================
+             VIEW 0: MAIN DASHBOARD / MENU
+             ========================================== -->
+        <section id="view-menu" class="view-container active-view">
+            <div class="menu-hero">
+                <h1>«ҚАЗАҚ ЖЕРІНДЕГІ ТАС, ҚОЛА, ТЕМІР ДӘУІРІ»</h1>
+                <p>52 студентке арналған интерактивті археологиялық-тарихи оқу аренасы. Академиялық және ҰБТ стандартындағы тексерілген деректер кешені.</p>
+                <div class="menu-hero-tags">
+                    <span class="tag-badge">👥 8 Команда</span>
+                    <span class="tag-badge">🪨 Палеолит • Мезолит • Неолит • Энеолит</span>
+                    <span class="tag-badge">🥉 Андрон • Беғазы-Дәндібай</span>
+                    <span class="tag-badge">⚔️ Сақ • Сармат • Үйсін • Қаңлы</span>
+                    <span class="tag-badge">⏱ Интерактивті таймер</span>
+                </div>
+            </div>
+
+            <!-- 6 Big Game Mode Cards -->
+            <div class="game-modes-grid">
+                <!-- Mode 1 -->
+                <div class="game-mode-card" data-mode="jeopardy">
+                    <div class="mode-icon-circle">🏆</div>
+                    <div class="mode-title">1. ТАРИХИ JEOPARDY</div>
+                    <div class="mode-desc">5 тақырыптық баған, 25 күрделі сұрақ (10-50 ұпай). Факт, себеп-салдар, салыстыру және археологиялық интерпретация.</div>
+                    <div class="mode-footer">
+                        <span class="mode-badge">25 Сұрақ</span>
+                        <button class="mode-btn-start">Ойынды бастау →</button>
+                    </div>
+                </div>
+
+                <!-- Mode 2 -->
+                <div class="game-mode-card" data-mode="detective">
+                    <div class="mode-icon-circle">🔎</div>
+                    <div class="mode-title">2. ТАРИХИ ДЕТЕКТИВ</div>
+                    <div class="mode-desc">10 құпия археологиялық кейс. Тарихи белгілер мен деректер арқылы дәуір мен мәдениетті анықтау және дәлелдеу.</div>
+                    <div class="mode-footer">
+                        <span class="mode-badge">10 Кейс</span>
+                        <button class="mode-btn-start">Ойынды бастау →</button>
+                    </div>
+                </div>
+
+                <!-- Mode 3 -->
+                <div class="game-mode-card" data-mode="expedition">
+                    <div class="mode-icon-circle">🗺️</div>
+                    <div class="mode-title">3. АРХЕОЛОГИЯЛЫҚ ЭКСПЕДИЦИЯ</div>
+                    <div class="mode-desc">Қазақстанның интерактивті картасы: Ботай, Есік, Шілікті, Берел, Беғазы, Таңбалы ескерткіштерін зерттеу.</div>
+                    <div class="mode-footer">
+                        <span class="mode-badge">10 Нысан</span>
+                        <button class="mode-btn-start">Ойынды бастау →</button>
+                    </div>
+                </div>
+
+                <!-- Mode 4 -->
+                <div class="game-mode-card" data-mode="timeMachine">
+                    <div class="mode-icon-circle">⏳</div>
+                    <div class="mode-title">4. УАҚЫТ МАШИНАСЫ</div>
+                    <div class="mode-desc">10 хронологиялық тапсырма. Drag & Drop және батырмалар арқылы тарихи оқиғалар мен құралдарды ретке келтіру.</div>
+                    <div class="mode-footer">
+                        <span class="mode-badge">10 Тапсырма</span>
+                        <button class="mode-btn-start">Ойынды бастау →</button>
+                    </div>
+                </div>
+
+                <!-- Mode 5 -->
+                <div class="game-mode-card" data-mode="court">
+                    <div class="mode-icon-circle">⚖️</div>
+                    <div class="mode-title">5. ДӘУІРЛЕР СОТЫ</div>
+                    <div class="mode-desc">10 тарихи пікірталас пен дилемма. Командалар аргумент келтіріп, оқытушы +10 Дәлел, +10 Дерек, +10 Талдау ұпайын береді.</div>
+                    <div class="mode-footer">
+                        <span class="mode-badge">10 Дебат</span>
+                        <button class="mode-btn-start">Ойынды бастау →</button>
+                    </div>
+                </div>
+
+                <!-- Mode 6 -->
+                <div class="game-mode-card" data-mode="strategy">
+                    <div class="mode-icon-circle">🧠</div>
+                    <div class="mode-title">6. ТАРИХИ СТРАТЕГИЯ</div>
+                    <div class="mode-desc">10 тарихи сценарий және шешім қабылдау (A, B, C, D). Себеп-салдарлық салдарды талдау және тарихи сабақтар.</div>
+                    <div class="mode-footer">
+                        <span class="mode-badge">10 Сценарий</span>
+                        <button class="mode-btn-start">Ойынды бастау →</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grand Final Bottom Trigger -->
+            <div class="bottom-actions-bar">
+                <button class="btn-grand-final" onclick="window.app.showView('final')">
+                    🏆 ҮЛКЕН ФИНАЛ — ҚОРЫТЫНДЫ РЕЙТИНГ ЖӘНЕ САЛТАНАТ
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 1: ТАРИХИ JEOPARDY
+             ========================================== -->
+        <section id="view-jeopardy" class="view-container">
+            <div class="game-header-bar">
+                <div class="game-title-group">
+                    <button class="btn-back-menu">← Мәзірге қайту</button>
+                    <div class="current-game-title">🏆 1-ОЙЫН: ТАРИХИ JEOPARDY</div>
+                </div>
+
+                <div class="answering-team-box">
+                    <span class="answering-label">Жауап беретін команда:</span>
+                    <select class="answering-select"></select>
+                </div>
+
+                <div class="timer-widget">
+                    <span class="timer-display">00:25</span>
+                    <div class="timer-controls-group">
+                        <button class="btn-timer-ctrl btn-timer-pause" title="Тоқтату / Жалғастыру">⏯</button>
+                        <button class="btn-timer-ctrl btn-timer-plus10" title="+10 секунд қосу">+10с</button>
+                        <button class="btn-timer-ctrl btn-timer-reset" title="Қайта қосу">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="jeopardy-board" class="jeopardy-board">
+                <!-- 5 Columns x 5 Rows Grid -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 2: ТАРИХИ ДЕТЕКТИВ
+             ========================================== -->
+        <section id="view-detective" class="view-container">
+            <div class="game-header-bar">
+                <div class="game-title-group">
+                    <button class="btn-back-menu">← Мәзірге қайту</button>
+                    <div class="current-game-title">🔎 2-ОЙЫН: ТАРИХИ ДЕТЕКТИВ</div>
+                </div>
+
+                <div class="answering-team-box">
+                    <span class="answering-label">Жауап беретін команда:</span>
+                    <select class="answering-select"></select>
+                </div>
+
+                <div class="timer-widget">
+                    <span class="timer-display">00:30</span>
+                    <div class="timer-controls-group">
+                        <button class="btn-timer-ctrl btn-timer-pause">⏯</button>
+                        <button class="btn-timer-ctrl btn-timer-plus10">+10с</button>
+                        <button class="btn-timer-ctrl btn-timer-reset">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detective-layout">
+                <!-- Case Selector -->
+                <div id="detective-case-list" class="case-selector-list">
+                    <!-- 10 Cases dynamically rendered -->
+                </div>
+
+                <!-- Case Details -->
+                <div class="case-detail-card">
+                    <div id="det-case-title" class="case-header-title">Кейс №1: «Дала тұлпарларының құпиясы»</div>
+                    
+                    <div class="clues-container">
+                        <div class="clues-title">📜 ТАБЫЛҒАН ТАРИХИ ДЕРЕКТЕР МЕН АЙҒАҚТАР:</div>
+                        <ul id="det-clues-list" class="clues-list"></ul>
+                    </div>
+
+                    <div style="font-size: 20px; font-weight: 800; color: #fff;">
+                        ❓ Сұрақ: <span id="det-question-text" style="color: #fbbf24;"></span>
+                    </div>
+
+                    <div id="det-options-grid" class="modal-options-grid"></div>
+
+                    <!-- Analysis Box -->
+                    <div class="detective-analysis-box">
+                        <div class="analysis-label">🧠 ТАЛДАУ ЖӘНЕ ДӘЛЕЛДЕУ КЕЗЕҢІ («Неліктен бұлай ойлайсыз?»):</div>
+                        <div id="det-analysis-prompt" class="analysis-prompt-text"></div>
+                    </div>
+
+                    <!-- Outcome & Academic Note -->
+                    <div id="det-outcome-box" class="modal-feedback-box">
+                        <div class="feedback-title correct">✓ ҒЫЛЫМИ-АКАДЕМИЯЛЫҚ АНЫҚТАМА:</div>
+                        <div id="det-academic-note" class="feedback-explanation"></div>
+                    </div>
+
+                    <!-- Teacher Rubric Scoring -->
+                    <div class="teacher-scoring-row">
+                        <span style="font-size: 15px; font-weight: 800; color: #fbbf24;">👨‍🏫 Оқытушының бағалауы:</span>
+                        <div class="scoring-btn-group">
+                            <button id="det-score-correct-btn" class="btn-score-custom">+20 Дұрыс жауап</button>
+                            <button id="det-score-evidence-btn" class="btn-score-custom">+10 Дәлел мен сапалы талдау</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: АРХЕОЛОГИЯЛЫҚ ЭКСПЕДИЦИЯ
+             ========================================== -->
+        <section id="view-expedition" class="view-container">
+            <div class="game-header-bar">
+                <div class="game-title-group">
+                    <button class="btn-back-menu">← Мәзірге қайту</button>
+                    <div class="current-game-title">🗺️ 3-ОЙЫН: АРХЕОЛОГИЯЛЫҚ ЭКСПЕДИЦИЯ</div>
+                </div>
+
+                <div class="answering-team-box">
+                    <span class="answering-label">Жауап беретін команда:</span>
+                    <select class="answering-select"></select>
+                </div>
+
+                <div class="timer-widget">
+                    <span class="timer-display">00:30</span>
+                    <div class="timer-controls-group">
+                        <button class="btn-timer-ctrl btn-timer-pause">⏯</button>
+                        <button class="btn-timer-ctrl btn-timer-plus10">+10с</button>
+                        <button class="btn-timer-ctrl btn-timer-reset">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expedition-grid">
+                <!-- Left: SVG Interactive Kazakhstan Map -->
+                <div class="map-wrapper">
+                    <div style="font-size: 16px; font-weight: 800; color: #06b6d4; margin-bottom: 12px; text-transform: uppercase;">
+                        ҚАЗАҚСТАННЫҢ АРХЕОЛОГИЯЛЫҚ ЕСКЕРТКІШТЕР КАРТАСЫ
+                    </div>
+                    <div id="kz-map-holder" class="kz-svg-map-container">
+                        <!-- Dynamic SVG Map with Pins -->
+                    </div>
+                    <div style="display: flex; gap: 14px; margin-top: 14px;">
+                        <button id="exp-prev-site-btn" class="btn-icon-control">← Алдыңғы нысан</button>
+                        <button id="exp-next-site-btn" class="btn-icon-control">Келесі нысан →</button>
+                    </div>
+                </div>
+
+                <!-- Right: Site Mission Questions -->
+                <div class="expedition-sidebar">
+                    <div>
+                        <div class="site-meta-header">
+                            <span id="exp-site-badge" class="site-badge-num">МИССИЯ 1 / 10</span>
+                            <h2 id="exp-site-name" class="site-name-heading">Ботай қонысы</h2>
+                        </div>
+
+                        <div class="site-info-block">
+                            <strong>📍 Аймағы:</strong> <span id="exp-site-region"></span><br>
+                            <strong>⏳ Дәуірі:</strong> <span id="exp-site-epoch"></span><br>
+                            <strong>💎 Маңызы:</strong> <span id="exp-site-significance"></span>
+                        </div>
+
+                        <div id="exp-questions-container">
+                            <!-- 3 Step Questions for this site -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 4: УАҚЫТ МАШИНАСЫ (CHRONOLOGY)
+             ========================================== -->
+        <section id="view-timeMachine" class="view-container">
+            <div class="game-header-bar">
+                <div class="game-title-group">
+                    <button class="btn-back-menu">← Мәзірге қайту</button>
+                    <div class="current-game-title">⏳ 4-ОЙЫН: УАҚЫТ МАШИНАСЫ</div>
+                </div>
+
+                <div class="answering-team-box">
+                    <span class="answering-label">Жауап беретін команда:</span>
+                    <select class="answering-select"></select>
+                </div>
+
+                <div class="timer-widget">
+                    <span class="timer-display">00:30</span>
+                    <div class="timer-controls-group">
+                        <button class="btn-timer-ctrl btn-timer-pause">⏯</button>
+                        <button class="btn-timer-ctrl btn-timer-plus10">+10с</button>
+                        <button class="btn-timer-ctrl btn-timer-reset">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="time-machine-container">
+                <div class="timeline-task-card">
+                    <div class="task-heading-meta">
+                        <span id="tm-task-badge" class="tag-badge">ХРОНОЛОГИЯ 1 / 10</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="tm-prev-btn" class="btn-icon-control">← Алдыңғы</button>
+                            <button id="tm-next-btn" class="btn-icon-control">Келесі →</button>
+                        </div>
+                    </div>
+
+                    <h2 id="tm-task-title" style="font-family: var(--font-heading); font-size: 24px; color: #fbbf24; margin-bottom: 8px;"></h2>
+                    <p id="tm-task-desc" class="task-instruction-text"></p>
+
+                    <!-- Draggable and Sortable List -->
+                    <div id="tm-sortable-list" class="sortable-timeline-list"></div>
+
+                    <!-- Feedback Box -->
+                    <div id="tm-feedback-box" class="modal-feedback-box"></div>
+
+                    <div style="display: flex; justify-content: center; gap: 14px; margin-top: 24px;">
+                        <button id="tm-check-btn" class="btn-grand-final" style="font-size: 18px; padding: 12px 36px;">
+                            ✓ Реттілікті тексеру (+20 ұпай)
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 5: ДӘУІРЛЕР СОТЫ (COURT OF ERAS)
+             ========================================== -->
+        <section id="view-court" class="view-container">
+            <div class="game-header-bar">
+                <div class="game-title-group">
+                    <button class="btn-back-menu">← Мәзірге қайту</button>
+                    <div class="current-game-title">⚖️ 5-ОЙЫН: ДӘУІРЛЕР СОТЫ</div>
+                </div>
+
+                <div class="answering-team-box">
+                    <span class="answering-label">Жауап беретін команда:</span>
+                    <select class="answering-select"></select>
+                </div>
+
+                <div class="timer-widget">
+                    <span class="timer-display">00:45</span>
+                    <div class="timer-controls-group">
+                        <button class="btn-timer-ctrl btn-timer-pause">⏯</button>
+                        <button class="btn-timer-ctrl btn-timer-plus10">+10с</button>
+                        <button class="btn-timer-ctrl btn-timer-reset">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="court-container">
+                <div class="court-card">
+                    <div class="task-heading-meta">
+                        <span id="court-badge" class="tag-badge">СОТ ІСІ 1 / 10</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="court-prev-btn" class="btn-icon-control">← Алдыңғы іс</button>
+                            <button id="court-next-btn" class="btn-icon-control">Келесі іс →</button>
+                        </div>
+                    </div>
+
+                    <h2 id="court-title" style="font-family: var(--font-heading); font-size: 24px; color: #fbbf24; margin-bottom: 16px;"></h2>
+
+                    <div id="court-dilemma" class="court-dilemma-box"></div>
+
+                    <!-- 2 Opposing Sides -->
+                    <div id="court-sides-grid" class="court-sides-grid"></div>
+
+                    <!-- Guiding questions & Historical Facts -->
+                    <div style="background: rgba(9, 13, 22, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 18px; margin-bottom: 24px;">
+                        <div style="font-weight: 800; color: #06b6d4; margin-bottom: 8px;">💡 Бағыттаушы сұрақтар мен тарихи деректер:</div>
+                        <ul id="court-guiding-list" style="padding-left: 20px; margin-bottom: 12px;"></ul>
+                        <div style="font-size: 15px; color: #fde68a;"><strong>Академиялық факт:</strong> <span id="court-facts-text"></span></div>
+                    </div>
+
+                    <!-- Teacher Rubric Controls -->
+                    <div class="court-rubric-bar">
+                        <span style="font-size: 16px; font-weight: 800; color: #fbbf24;">👨‍🏫 Оқытушының бағалауы:</span>
+                        <div class="rubric-btn-group">
+                            <button id="btn-court-evidence" class="btn-rubric-point">💡 +10 Дәлел</button>
+                            <button id="btn-court-fact" class="btn-rubric-point">📜 +10 Дерек</button>
+                            <button id="btn-court-analysis" class="btn-rubric-point">🧠 +10 Талдау</button>
+                            <button id="btn-court-rhetoric" class="btn-rubric-point">🎯 +10 Шешендік</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 6: ТАРИХИ СТРАТЕГИЯ
+             ========================================== -->
+        <section id="view-strategy" class="view-container">
+            <div class="game-header-bar">
+                <div class="game-title-group">
+                    <button class="btn-back-menu">← Мәзірге қайту</button>
+                    <div class="current-game-title">🧠 6-ОЙЫН: ТАРИХИ СТРАТЕГИЯ</div>
+                </div>
+
+                <div class="answering-team-box">
+                    <span class="answering-label">Жауап беретін команда:</span>
+                    <select class="answering-select"></select>
+                </div>
+
+                <div class="timer-widget">
+                    <span class="timer-display">00:30</span>
+                    <div class="timer-controls-group">
+                        <button class="btn-timer-ctrl btn-timer-pause">⏯</button>
+                        <button class="btn-timer-ctrl btn-timer-plus10">+10с</button>
+                        <button class="btn-timer-ctrl btn-timer-reset">↺</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="strategy-container">
+                <div class="strategy-card">
+                    <div class="task-heading-meta">
+                        <span id="strat-badge" class="tag-badge">СЦЕНАРИЙ 1 / 10</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="strat-prev-btn" class="btn-icon-control">← Алдыңғы сценарий</button>
+                            <button id="strat-next-btn" class="btn-icon-control">Келесі сценарий →</button>
+                        </div>
+                    </div>
+
+                    <h2 id="strat-title" style="font-family: var(--font-heading); font-size: 24px; color: #fbbf24; margin-bottom: 16px;"></h2>
+
+                    <div class="strategy-context-box">
+                        <div id="strat-context" class="strategy-context-text"></div>
+                    </div>
+
+                    <!-- 4 Strategic Choices A, B, C, D -->
+                    <div id="strat-choices-grid" class="strategy-choices-grid"></div>
+
+                    <!-- Outcome & Consequences -->
+                    <div id="strat-outcome-box" class="strategy-outcome-card">
+                        <div style="font-weight: 800; font-size: 18px; color: #34d399; margin-bottom: 8px;">⚡ ШЕШІМНІҢ ТАРИХИ САЛДАРЫ:</div>
+                        <div id="strat-consequence-text" style="font-size: 17px; color: #f8fafc; margin-bottom: 16px;"></div>
+
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-bottom: 12px;">
+                            <div style="font-weight: 800; color: #06b6d4; font-size: 15px;">🔍 2-ДЕҢГЕЙ ТАЛДАУ («Неліктен осы шешімді таңдадыңыз?»):</div>
+                            <div id="strat-second-prompt" style="font-style: italic; color: #e2e8f0; font-size: 16px; margin-top: 4px;"></div>
+                        </div>
+
+                        <div style="font-size: 14px; color: #fbbf24;"><strong>Тарихи сабақ:</strong> <span id="strat-academic-lesson"></span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 7: ҮЛКЕН ФИНАЛ (PODIUM & STATS)
+             ========================================== -->
+        <section id="view-final" class="view-container">
+            <div class="final-view-container">
+                <div class="final-hero">
+                    <h1>🏆 САЛТАНАТТЫ ҮЛКЕН ФИНАЛ 🏆</h1>
+                    <p style="font-size: 20px; color: #06b6d4;">«Қазақ жеріндегі тас, қола, темір дәуірі» тарихи аренасының жеңімпаздары</p>
+                </div>
+
+                <!-- 3D Gold / Silver / Bronze Podium -->
+                <div class="podium-section">
+                    <!-- 2nd Place -->
+                    <div class="podium-place">
+                        <div class="podium-avatar-crown">🥈</div>
+                        <div id="podium-2-name" class="podium-team-name">2-орын</div>
+                        <div id="podium-2-score" class="podium-team-score">0 ұпай</div>
+                        <div class="podium-pedestal pedestal-2">2</div>
+                    </div>
+
+                    <!-- 1st Place -->
+                    <div class="podium-place">
+                        <div class="podium-avatar-crown">🥇 👑</div>
+                        <div id="podium-1-name" class="podium-team-name">1-орын ЖЕҢІМПАЗ</div>
+                        <div id="podium-1-score" class="podium-team-score">0 ұпай</div>
+                        <div class="podium-pedestal pedestal-1">1</div>
+                    </div>
+
+                    <!-- 3rd Place -->
+                    <div class="podium-place">
+                        <div class="podium-avatar-crown">🥉</div>
+                        <div id="podium-3-name" class="podium-team-name">3-орын</div>
+                        <div id="podium-3-score" class="podium-team-score">0 ұпай</div>
+                        <div class="podium-pedestal pedestal-3">3</div>
+                    </div>
+                </div>
+
+                <!-- Full 8 Teams Stats Table -->
+                <div class="stats-table-card">
+                    <h2 style="font-family: var(--font-heading); font-size: 22px; color: #fbbf24; margin-bottom: 18px;">
+                        📊 8 КОМАНДАНЫҢ ТОЛЫҚ ҚОРЫТЫНДЫ СТАТИСТИКАСЫ
+                    </h2>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Орын</th>
+                                <th>Команда атауы</th>
+                                <th>Құрамы</th>
+                                <th>Жалпы ұпай</th>
+                                <th>Дұрыс жауап</th>
+                                <th>Талдау ұпайы</th>
+                                <th>Жылдамдық</th>
+                                <th>Қатысқан ойын</th>
+                            </tr>
+                        </thead>
+                        <tbody id="final-stats-tbody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- SVG Comparative Analytics Chart -->
+                <div class="chart-container-box">
+                    <div class="chart-title">📈 ҰПАЙЛАРДЫҢ САЛЫСТЫРМАЛЫ ДИАГРАММАСЫ</div>
+                    <div id="final-chart-wrapper" class="svg-chart-wrapper"></div>
+                </div>
+
+                <!-- Actions -->
+                <div class="bottom-actions-bar" style="margin-bottom: 40px;">
+                    <button class="btn-back-menu" onclick="window.app.showView('menu')">← Басты мәзірге қайту</button>
+                    <button id="btn-print-certificate" class="btn-grand-final" style="font-size: 18px; padding: 12px 36px;">
+                        🖨️ Нәтижені басып шығару / Сертификат
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================================================
+         MODALS: JEOPARDY QUESTION MODAL
+         ========================================================================== -->
+    <div id="jeopardy-modal" class="modal-overlay">
+        <div class="modal-box-large">
+            <div class="modal-top-meta">
+                <span id="j-modal-cat" class="modal-badge-cat">ТАС ДӘУІРІ</span>
+                <span id="j-modal-points" class="modal-points-badge">+10 ұпай</span>
+            </div>
+
+            <div id="j-modal-qtext" class="modal-question-text">Сұрақ мәтіні осында шығады...</div>
+
+            <div id="j-modal-options" class="modal-options-grid"></div>
+
+            <div id="j-modal-feedback" class="modal-feedback-box"></div>
+
+            <div class="modal-footer-actions">
+                <div class="award-controls-box">
+                    <span class="award-label">Оқытушы жедел ұпай қосу:</span>
+                    <button id="j-modal-award-btn" class="btn-award">+ Ұпайды беру</button>
+                </div>
+                <button class="btn-modal-close">Жабу</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+         MODALS: TEACHER / MODERATOR PANEL
+         ========================================================================== -->
+    <div id="teacher-modal" class="modal-overlay">
+        <div class="teacher-modal-card">
+            <h2 style="font-family: var(--font-heading); color: #06b6d4; font-size: 26px; margin-bottom: 8px;">
+                👨‍🏫 ОҚЫТУШЫ РЕЖИМІ — БАСҚАРУ ПАНЕЛІ
+            </h2>
+            <p style="color: #94a3b8; font-size: 15px; margin-bottom: 20px;">
+                Командалардың атын, студенттер санын және ағымдағы ұпайларын түзетуге болады. Барлық 52 студент 8 командаға бөлінген.
+            </p>
+
+            <div style="display: grid; grid-template-columns: 40px 1.5fr 1fr 1fr; gap: 12px; font-size: 13px; font-weight: 800; color: #fbbf24; margin-bottom: 6px; padding: 0 14px;">
+                <span>Эмблема</span>
+                <span>Команда атауы</span>
+                <span>Ұпайы</span>
+                <span>Студент саны</span>
+            </div>
+
+            <div id="teacher-teams-edit-list" style="margin-bottom: 24px;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 18px; flex-wrap: wrap; gap: 10px;">
+                <button id="teacher-reset-all-btn" style="background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #f87171; font-weight: 800; padding: 10px 18px; border-radius: 8px; cursor: pointer;">
+                    ⚠️ Барлық ойынды нөлден бастау
+                </button>
+
+                <div style="display: flex; gap: 10px;">
+                    <button id="teacher-save-btn" class="mode-btn-start" style="padding: 10px 24px;">Сақтау</button>
+                    <button id="teacher-close-btn" class="btn-icon-control">Жабу</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/audio.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
