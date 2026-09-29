@@ -47,6 +47,7 @@ class HistoryArenaApp {
             if (saved) {
                 const parsed = JSON.parse(saved);
                 if (parsed.teams && parsed.teams.length === 8) {
+                    if (!parsed.jeopardyStatus) parsed.jeopardyStatus = {};
                     return parsed;
                 }
             }
@@ -55,7 +56,7 @@ class HistoryArenaApp {
         }
         return {
             teams: JSON.parse(JSON.stringify(this.defaultTeams)),
-            jeopardyAnswered: [],
+            jeopardyStatus: {}, // qId -> 'correct' | 'wrong'
             detectiveCompleted: [],
             expeditionCompleted: [],
             timeMachineCompleted: [],
@@ -286,6 +287,8 @@ class HistoryArenaApp {
         if (!board) return;
         board.innerHTML = '';
 
+        if (!this.state.jeopardyStatus) this.state.jeopardyStatus = {};
+
         GAME_DATA.jeopardy.categories.forEach(cat => {
             const col = document.createElement('div');
             col.className = 'jeopardy-col';
@@ -299,12 +302,26 @@ class HistoryArenaApp {
             const catQuestions = GAME_DATA.jeopardy.questions.filter(q => q.catId === cat.id);
             catQuestions.forEach(q => {
                 const btn = document.createElement('button');
-                const isAnswered = this.state.jeopardyAnswered.includes(q.id);
-                btn.className = `jeopardy-btn ${isAnswered ? 'answered' : ''}`;
-                btn.textContent = `${q.points}`;
-                if (!isAnswered) {
+                const status = this.state.jeopardyStatus[q.id];
+
+                if (status === 'correct') {
+                    // Дұрыс жауап берілген ұяшық қызыл түске боялсын. Қайтадан ұяшық ашылмасын.
+                    btn.className = 'jeopardy-btn answered-correct';
+                    btn.innerHTML = `<span>${q.points}</span><span class="cell-status-sub">✓ Дұрыс</span>`;
+                    btn.title = "Бұл сұраққа дұрыс жауап берілген (Жабық)";
+                } else if (status === 'wrong') {
+                    // Қате жауап берілген ұяшық қара түске боялып қайтадан ашуға мүмкіндік болсын.
+                    btn.className = 'jeopardy-btn answered-wrong';
+                    btn.innerHTML = `<span>${q.points}</span><span class="cell-status-sub">↺ Ашу</span>`;
+                    btn.title = "Бұл сұрақта қателік болған. Қайта ашып жауап беруге болады!";
+                    btn.addEventListener('click', () => this.openJeopardyModal(q));
+                } else {
+                    // Ашылмаған ұяшық
+                    btn.className = 'jeopardy-btn';
+                    btn.innerHTML = `<span>${q.points}</span>`;
                     btn.addEventListener('click', () => this.openJeopardyModal(q));
                 }
+
                 col.appendChild(btn);
             });
 
@@ -328,6 +345,7 @@ class HistoryArenaApp {
         question.options.forEach((optText, idx) => {
             const btn = document.createElement('button');
             btn.className = 'btn-option-card';
+            btn.dataset.idx = idx;
             btn.innerHTML = `<span class="opt-prefix">${letters[idx]}</span><span>${optText}</span>`;
             btn.addEventListener('click', () => this.handleJeopardyAnswer(idx, btn));
             optsContainer.appendChild(btn);
@@ -340,7 +358,7 @@ class HistoryArenaApp {
 
         document.getElementById('j-modal-award-btn').onclick = () => {
             this.addScore(this.activeTeamId, question.points, 'correct');
-            this.markJeopardyAnswered(question.id);
+            this.setJeopardyStatus(question.id, 'correct');
             modal.classList.remove('active');
             this.renderJeopardyBoard();
         };
@@ -350,43 +368,53 @@ class HistoryArenaApp {
     }
 
     handleJeopardyAnswer(selectedIdx, btnElement) {
-        this.stopTimer();
         const q = this.currentJeopardyQuestion;
         const isCorrect = selectedIdx === q.correct;
         const fbBox = document.getElementById('j-modal-feedback');
 
-        document.querySelectorAll('#j-modal-options .btn-option-card').forEach((btn, idx) => {
-            btn.classList.add('disabled');
-            if (idx === q.correct) {
-                btn.classList.add('correct');
-            } else if (idx === selectedIdx && !isCorrect) {
-                btn.classList.add('wrong');
-            }
-        });
-
         if (isCorrect) {
+            // Дұрыс жауапты басқанда ғана жасыл түс жансын
+            this.stopTimer();
+            btnElement.classList.add('correct');
             window.soundManager.playCorrect();
+
             fbBox.innerHTML = `
                 <div class="feedback-title correct">✓ ДҰРЫС ЖАУАП! (+${q.points} ұпай)</div>
                 <div class="feedback-explanation">${q.explanation}</div>
             `;
+            fbBox.classList.add('active');
+
+            // Disable all other options
+            document.querySelectorAll('#j-modal-options .btn-option-card').forEach(b => b.classList.add('disabled'));
+
+            // Award score and mark cell permanently RED on board
             this.addScore(this.activeTeamId, q.points, 'correct');
+            this.setJeopardyStatus(q.id, 'correct');
+            this.renderJeopardyBoard();
         } else {
+            // Тек қате жауап қызыл болып жансын. Дұрыс жауаптар көрсетілмесін!
+            btnElement.classList.add('wrong');
+            btnElement.classList.add('disabled');
             window.soundManager.playWrong();
+
             fbBox.innerHTML = `
                 <div class="feedback-title wrong">✗ ҚАТЕ ЖАУАП!</div>
-                <div class="feedback-explanation"><strong>Дұрыс жауап:</strong> ${q.options[q.correct]}<br><br>${q.explanation}</div>
+                <div class="feedback-explanation">Бұл нұсқа қате. Басқа командалар немесе келесі ойыншы дұрыс нұсқаны табуға жауап бере алады!</div>
             `;
+            fbBox.classList.add('active');
+
+            // Қате жауап берілген ұяшық қара түске боялып қайтадан ашуға мүмкіндік болсын
+            if (this.state.jeopardyStatus[q.id] !== 'correct') {
+                this.setJeopardyStatus(q.id, 'wrong');
+                this.renderJeopardyBoard();
+            }
         }
-        fbBox.classList.add('active');
-        this.markJeopardyAnswered(q.id);
     }
 
-    markJeopardyAnswered(qId) {
-        if (!this.state.jeopardyAnswered.includes(qId)) {
-            this.state.jeopardyAnswered.push(qId);
-            this.saveState();
-        }
+    setJeopardyStatus(qId, status) {
+        if (!this.state.jeopardyStatus) this.state.jeopardyStatus = {};
+        this.state.jeopardyStatus[qId] = status;
+        this.saveState();
     }
 
     // ==========================================
@@ -457,25 +485,26 @@ class HistoryArenaApp {
     }
 
     handleDetectiveAnswer(selectedIdx, detCase) {
-        this.stopTimer();
         const isCorrect = selectedIdx === detCase.correct;
         const outcomeBox = document.getElementById('det-outcome-box');
-
-        document.querySelectorAll('#det-options-grid .btn-option-card').forEach((btn, idx) => {
-            btn.classList.add('disabled');
-            if (idx === detCase.correct) btn.classList.add('correct');
-            else if (idx === selectedIdx && !isCorrect) btn.classList.add('wrong');
-        });
+        const selectedBtn = document.querySelectorAll('#det-options-grid .btn-option-card')[selectedIdx];
 
         if (isCorrect) {
+            this.stopTimer();
+            if (selectedBtn) selectedBtn.classList.add('correct');
+            document.querySelectorAll('#det-options-grid .btn-option-card').forEach(b => b.classList.add('disabled'));
             window.soundManager.playCorrect();
             this.addScore(this.activeTeamId, detCase.scoreCorrect, 'correct');
+            outcomeBox.style.display = 'block';
+            this.markDetectiveCompleted(detCase.id);
         } else {
+            // Тек қате жауап қызыл болып жанады, дұрыс жауап көрсетілмейді
+            if (selectedBtn) {
+                selectedBtn.classList.add('wrong');
+                selectedBtn.classList.add('disabled');
+            }
             window.soundManager.playWrong();
         }
-
-        outcomeBox.style.display = 'block';
-        this.markDetectiveCompleted(detCase.id);
     }
 
     markDetectiveCompleted(caseId) {
@@ -527,11 +556,13 @@ class HistoryArenaApp {
                         optBtn.classList.add('correct');
                         window.soundManager.playCorrect();
                         this.addScore(this.activeTeamId, 10, 'correct');
+                        optsGrid.querySelectorAll('button').forEach(b => b.classList.add('disabled'));
                     } else {
+                        // Тек қате жауап қызыл болады, дұрыс жауап көрсетілмейді
                         optBtn.classList.add('wrong');
+                        optBtn.classList.add('disabled');
                         window.soundManager.playWrong();
                     }
-                    optsGrid.querySelectorAll('button').forEach(b => b.classList.add('disabled'));
                 });
                 optsGrid.appendChild(optBtn);
             });

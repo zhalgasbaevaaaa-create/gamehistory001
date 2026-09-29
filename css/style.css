@@ -570,55 +570,77 @@ body {
     color: var(--gold-bright);
 }
 
-/* Projector-Ready Big Timer */
+/* Projector-Ready Big High-Contrast Timer */
 .timer-widget {
     display: flex;
     align-items: center;
     gap: 16px;
-    background: rgba(9, 13, 22, 0.8);
-    border: 2px solid var(--gold-dark);
-    border-radius: var(--radius-full);
-    padding: 6px 18px;
+    background: linear-gradient(135deg, #090e1a 0%, #030712 100%);
+    border: 3px solid var(--gold-bright);
+    border-radius: var(--radius-lg);
+    padding: 8px 22px;
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(0, 0, 0, 0.8);
+}
+
+.timer-label-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.timer-label-text {
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--turquoise);
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
 .timer-display {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 32px;
+    font-family: 'Courier New', 'Consolas', monospace;
+    font-size: 38px;
     font-weight: 900;
-    color: var(--gold-bright);
-    letter-spacing: 2px;
-    min-width: 100px;
+    color: #fef08a;
+    letter-spacing: 3px;
+    min-width: 130px;
     text-align: center;
-    text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    text-shadow: 0 0 18px rgba(251, 191, 36, 0.9), 0 0 30px rgba(245, 158, 11, 0.5);
+    background: rgba(0, 0, 0, 0.55);
+    padding: 2px 14px;
+    border-radius: 8px;
+    border: 1.5px solid rgba(251, 191, 36, 0.4);
 }
 
 .timer-widget.urgent {
-    border-color: var(--ruby);
+    border-color: #ef4444;
+    background: linear-gradient(135deg, #450a0a 0%, #1a0505 100%);
+    box-shadow: 0 0 35px rgba(239, 68, 68, 0.8);
     animation: urgentPulse 0.5s infinite alternate;
 }
 
 .timer-widget.urgent .timer-display {
-    color: var(--ruby-light);
-    text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+    color: #ff8080;
+    border-color: #ef4444;
+    text-shadow: 0 0 25px rgba(239, 68, 68, 1);
 }
 
 @keyframes urgentPulse {
-    from { box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); transform: scale(1); }
-    to { box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); transform: scale(1.04); }
+    from { box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); transform: scale(1); }
+    to { box-shadow: 0 0 35px rgba(239, 68, 68, 0.9); transform: scale(1.04); }
 }
 
 .timer-controls-group {
     display: flex;
-    gap: 6px;
+    gap: 8px;
 }
 
 .btn-timer-ctrl {
     background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
     color: var(--text-gold);
-    font-size: 13px;
-    font-weight: 700;
-    padding: 5px 10px;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 8px 14px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.15s;
@@ -627,40 +649,11 @@ body {
 .btn-timer-ctrl:hover {
     background: var(--gold-bright);
     color: #090d16;
+    border-color: #fff;
+    transform: translateY(-2px);
 }
 
-/* Answering Team Indicator in Bar */
-.answering-team-box {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(6, 182, 212, 0.1);
-    border: 1px solid rgba(6, 182, 212, 0.4);
-    padding: 6px 16px;
-    border-radius: var(--radius-md);
-}
-
-.answering-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-
-.answering-select {
-    background: var(--bg-dark);
-    border: 1px solid var(--turquoise);
-    color: var(--turquoise);
-    font-size: 16px;
-    font-weight: 800;
-    padding: 4px 10px;
-    border-radius: var(--radius-sm);
-    outline: none;
-    cursor: pointer;
-}
-
-/* ==========================================================================
-   1-ОЙЫН: JEOPARDY BOARD
-   ========================================================================== */
+/* Jeopardy Board Cells */
 .jeopardy-board {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -697,7 +690,7 @@ body {
     background: var(--bg-card);
     border: 2px solid rgba(217, 119, 6, 0.4);
     border-radius: var(--radius-md);
-    padding: 24px 10px;
+    padding: 22px 10px;
     text-align: center;
     font-family: var(--font-heading);
     font-size: 32px;
@@ -706,9 +699,13 @@ body {
     cursor: pointer;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
-.jeopardy-btn:hover:not(.answered) {
+.jeopardy-btn:hover:not(.answered-correct) {
     background: var(--gold-gradient);
     color: #090d16;
     border-color: #fff;
@@ -716,13 +713,74 @@ body {
     box-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
 }
 
-.jeopardy-btn.answered {
-    background: rgba(19, 27, 46, 0.4);
-    border-color: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.2);
-    cursor: default;
-    box-shadow: none;
-    transform: none;
+/* ДҰРЫС ЖАУАП БЕРІЛГЕН ҰЯШЫҚ — ҚЫЗЫЛ ТҮСКЕ БОЯЛАДЫ, ҚАЙТА АШЫЛМАЙДЫ */
+.jeopardy-btn.answered-correct {
+    background: linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #7f1d1d 100%) !important;
+    border: 2.5px solid #ef4444 !important;
+    color: #ffffff !important;
+    cursor: not-allowed !important;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.6) !important;
+    transform: none !important;
+    pointer-events: none !important;
+    opacity: 0.95;
+}
+
+.jeopardy-btn.answered-correct .cell-status-sub {
+    font-size: 11px;
+    font-weight: 800;
+    color: #fee2e2;
+    margin-top: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* ҚАТЕ ЖАУАП БЕРІЛГЕН ҰЯШЫҚ — ҚАРА ТҮСКЕ БОЯЛАДЫ, ҚАЙТА АШУҒА БОЛАДЫ */
+.jeopardy-btn.answered-wrong {
+    background: #090d15 !important;
+    border: 2px solid #334155 !important;
+    color: #94a3b8 !important;
+    cursor: pointer !important;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8) !important;
+}
+
+.jeopardy-btn.answered-wrong:hover {
+    border-color: var(--gold-bright) !important;
+    color: #ffffff !important;
+    background: #111827 !important;
+    transform: scale(1.03) !important;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4) !important;
+}
+
+.jeopardy-btn.answered-wrong .cell-status-sub {
+    font-size: 11px;
+    font-weight: 800;
+    color: #f87171;
+    margin-top: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Options Cards & Feedback Highlights */
+.btn-option-card.correct {
+    background: rgba(16, 185, 129, 0.35) !important;
+    border: 2.5px solid #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.6) !important;
+    transform: scale(1.02);
+}
+
+.btn-option-card.wrong {
+    background: rgba(239, 68, 68, 0.35) !important;
+    border: 2.5px solid #ef4444 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.6) !important;
+    animation: optionShake 0.4s ease;
+}
+
+@keyframes optionShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
 }
 
 /* Jeopardy Modal / Question Popup */
